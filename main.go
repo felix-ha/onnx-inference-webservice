@@ -39,12 +39,9 @@ func runInference(w http.ResponseWriter, r *http.Request) {
 	}
 
 	model := data.Model
-	ínput := data.Input
+	input_raw := data.Input
 
-	fmt.Println("run inference with " + model + " and data")
-	fmt.Println(ínput)
-
-	input := tensor.New(tensor.WithShape(1, 4), tensor.WithBacking(ínput))
+	input := tensor.New(tensor.WithShape(1, 4), tensor.WithBacking(input_raw))
 	logits := inference.Infere(model, input)
 
 	w.Header().Set("Content-Type", "application/json")

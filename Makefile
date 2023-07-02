@@ -8,4 +8,4 @@ docker_run:
 
 .PHONY: request
 request:
-	curl -i http://0.0.0.0:80/inference
+	curl -H "Content-Type: application/json" -d '{"model":"model.onnx","x":[0.8,0.071,-0.28,0.148]}' -i http://0.0.0.0:80/inference

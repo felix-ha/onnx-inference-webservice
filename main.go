@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"onnx-inference/inference"
 	"reflect"
@@ -11,18 +12,43 @@ import (
 	"gorgonia.org/tensor"
 )
 
-type Data struct {
+type RequestData struct {
+	Model string    `json:"model"`
+	Input []float32 `json:"input"`
+}
+
+type ResponseData struct {
 	Info   string
 	Logits []float32
 }
 
 func runInference(w http.ResponseWriter, r *http.Request) {
-	model := "model.onnx"
-	input := tensor.New(tensor.WithShape(1, 4), tensor.WithBacking([]float32{0.2, 0.4, 0.34, 0.5}))
+	defer r.Body.Close()
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+
+	var data RequestData
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		http.Error(w, "Failed to parse JSON data", http.StatusBadRequest)
+		return
+	}
+
+	model := data.Model
+	ínput := data.Input
+
+	fmt.Println("run inference with " + model + " and data")
+	fmt.Println(ínput)
+
+	input := tensor.New(tensor.WithShape(1, 4), tensor.WithBacking(ínput))
 	logits := inference.Infere(model, input)
 
 	w.Header().Set("Content-Type", "application/json")
-	post := &Data{
+	post := &ResponseData{
 		Info:   "done",
 		Logits: logits,
 	}

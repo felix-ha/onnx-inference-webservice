@@ -7,3 +7,5 @@ RUN go mod tidy
 RUN go install onnx-inference
 
 ENTRYPOINT /go/bin/onnx-inference
+
+EXPOSE 8080

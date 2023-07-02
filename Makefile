@@ -4,4 +4,8 @@ docker_build:
 
 .PHONY: docker_run
 docker_run:
-	docker run --name onnx --rm onnx
+	docker run --publish 80:8080 --name onnx --rm onnx
+
+.PHONY: request
+request:
+	curl -i http://0.0.0.0:80/inference

@@ -9,7 +9,8 @@ import (
 	"gorgonia.org/tensor"
 )
 
-func Infere(model_name string, input *tensor.Dense) []tensor.Tensor {
+// Infere runs a inference for the given model and assumes batch size one.
+func Infere(model_name string, input *tensor.Dense) []float32 {
 	backend := gorgonnx.NewGraph()
 
 	model := onnx.NewModel(backend)
@@ -27,7 +28,8 @@ func Infere(model_name string, input *tensor.Dense) []tensor.Tensor {
 		log.Fatal(err)
 	}
 
-	logits, _ := model.GetOutputTensors()
+	logits_raw, _ := model.GetOutputTensors()
+	logits := logits_raw[0].Data().([]float32)
 
 	return logits
 }
